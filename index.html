@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI文案库 - 智能文案生成与编辑平台</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .nav-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255,255,255,0.2);
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-color {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .theme-color.active {
+            border-color: var(--text-color);
+        }
+
+        /* 功能卡片样式 */
+        .function-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(74, 111, 165, 0.05);
+            border-radius: 5px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* 文案类型标签 */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 8px 15px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background-color: #dee2e6;
+        }
+
+        .tag.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边导航栏 -->
+        <div class="sidebar">
+            <div class="logo">AI文案库</div>
+            
+            <div class="nav-section">
+                <div class="nav-title">文案生成</div>
+                <div class="nav-item active" data-function="emotion">
+                    <i>😊</i> 情绪文案
+                </div>
+                <div class="nav-item" data-function="life">
+                    <i>🌱</i> 生活文案
+                </div>
+                <div class="nav-item" data-function="love">
+                    <i>❤️</i> 情感文案
+                </div>
+                <div class="nav-item" data-function="free">
+                    <i>🌊</i> 潇洒文案
+                </div>
+                <div class="nav-item" data-function="sad">
+                    <i>😔</i> 伤感文案
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">文案编辑</div>
+                <div class="nav-item" data-function="polish">
+                    <i>✨</i> 文案润色
+                </div>
+                <div class="nav-item" data-function="expand">
+                    <i>📈</i> 文案扩写
+                </div>
+                <div class="nav-item" data-function="shorten">
+                    <i>📉</i> 文案缩写
+                </div>
+                <div class="nav-item" data-function="modify">
+                    <i>✏️</i> 文稿修改
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">专业文案</div>
+                <div class="nav-item" data-function="news">
+                    <i>📰</i> 新闻写作
+                </div>
+                <div class="nav-item" data-function="opinion">
+                    <i>🗣️</i> 舆论引导
+                </div>
+                <div class="nav-item" data-function="marketing">
+                    <i>📢</i> 营销文案
+                </div>
+                <div class="nav-item" data-function="creative">
+                    <i>🎨</i> 创意写作
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="header">
+                <div class="page-title">情绪文案生成</div>
+                <div class="theme-selector">
+                    <div class="theme-color" style="background-color: #4a6fa5;" data-color="blue"></div>
+                    <div class="theme-color" style="background-color: #d9534f;" data-color="red"></div>
+                    <div class="theme-color" style="background-color: #5cb85c;" data-color="green"></div>
+                    <div class="theme-color" style="background-color: #f0ad4e;" data-color="orange"></div>
+                    <div class="theme-color" style="background-color: #5bc0de;" data-color="cyan"></div>
+                </div>
+            </div>
+            
+            <!-- 情绪文案生成 -->
+            <div class="function-card" id="emotion-card">
+                <div class="card-title">
+                    <i>😊</i> 情绪文案生成
+                </div>
+                <div class="input-group">
+                    <label>选择情绪类型</label>
+                    <div class="tag-container">
+                        <div class="tag active">快乐</div>
+                        <div class="tag">兴奋</div>
+                        <div class="tag">平静</div>
+                        <div class="tag">忧郁</div>
+                        <div class="tag">愤怒</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>文案长度</label>
+                    <select>
+                        <option>短文案 (50字以内)</option>
+                        <option selected>中等文案 (50-150字)</option>
+                        <option>长文案 (150字以上)</option>
+                    </select>
+                </div>
+                <button class="btn" id="generate-emotion">生成文案</button>
+                <div class="result-area" id="emotion-result">
+                    生成的文案将显示在这里...
+                </div>
+            </div>
+            
+            <!-- 生活文案生成 -->
+            <div class="function-card hidden" id="life-card">
+                <div class="card-title">
+                    <i>🌱</i> 生活文案生成
+                </div>
+                <div class="input-group">
+                    <label>生活场景</label>
+                    <div class="tag-container">
+                        <div class="tag active">日常分享</div>
+                        <div class="tag">旅行记录</div>
+                        <div class="tag">美食体验</div>
+                        <div class="tag">工作感悟</div>
+                        <div class="tag">家庭时光</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>文案风格</label>
+                    <select>
+                        <option>轻松幽默</option>
+                        <option selected>温馨治愈</option>
+                        <option>深度思考</option>
+                        <option>简洁明了</option>
+                    </select>
+                </div>
+                <button class="btn" id="generate-life">生成文案</button>
+                <div class="result-area" id="life-result">
+                    生成的文案将显示在这里...
+                </div>
+            </div>
+            
+            <!-- 文案润色 -->
+            <div class="function-card hidden" id="polish-card">
+                <div class="card-title">
+                    <i>✨</i> 文案润色
+                </div>
+                <div class="input-group">
+                    <label>输入需要润色的文案</label>
+                    <textarea placeholder="请输入需要润色的文案..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>润色风格</label>
+                    <select>
+                        <option>更正式</option>
+                        <option selected>更生动</option>
+                        <option>更简洁</option>
+                        <option>更文艺</option>
+                    </select>
+                </div>
+                <button class="btn" id="polish-text">润色文案</button>
+                <div class="result-area" id="polish-result">
+                    润色后的文案将显示在这里...
+                </div>
+            </div>
+            
+            <!-- 新闻写作 -->
+            <div class="function-card hidden" id="news-card">
+                <div class="card-title">
+                    <i>📰</i> 新闻写作
+                </div>
+                <div class="input-group">
+                    <label>新闻主题</label>
+                    <input type="text" placeholder="请输入新闻主题...">
+                </div>
+                <div class="input-group">
+                    <label>新闻类型</label>
+                    <select>
+                        <option>时事新闻</option>
+                        <option>财经新闻</option>
+                        <option selected>科技新闻</option>
+                        <option>娱乐新闻</option>
+                        <option>体育新闻</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>新闻要点 (可选)</label>
+                    <textarea placeholder="请输入新闻要点，每行一个..."></textarea>
+                </div>
+                <button class="btn" id="generate-news">生成新闻稿</button>
+                <div class="result-area" id="news-result">
+                    生成的新闻稿将显示在这里...
+                </div>
+            </div>
+            
+            <!-- 其他功能卡片... -->
+        </div>
+    </div>
+
+    <script>
+        // 切换功能卡片
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                document.querySelectorAll('.function-card').forEach(card => {
+                    card.classList.add('hidden');
+                });
+                
+                // 设置当前活动状态
+                this.classList.add('active');
+                const functionName = this.getAttribute('data-function');
+                document.getElementById(`${functionName}-card`).classList.remove('hidden');
+                
+                // 更新页面标题
+                document.querySelector('.page-title').textContent = this.textContent.trim();
+            });
+        });
+
+        // 主题颜色切换
+        document.querySelectorAll('.theme-color').forEach(color => {
+            color.addEventListener('click', function() {
+                document.querySelectorAll('.theme-color').forEach(c => {
+                    c.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                const colorName = this.getAttribute('data-color');
+                changeTheme(colorName);
+            });
+        });
+
+        // 标签选择
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                if (!this.parentElement.classList.contains('single-select')) {
+                    this.classList.toggle('active');
+                } else {
+                    this.parentElement.querySelectorAll('.tag').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // 更改主题函数
+        function changeTheme(color) {
+            const root = document.documentElement;
+            
+            switch(color) {
+                case 'blue':
+                    root.style.setProperty('--primary-color', '#4a6fa5');
+                    root.style.setProperty('--secondary-color', '#6b8cbc');
+                    break;
+                case 'red':
+                    root.style.setProperty('--primary-color', '#d9534f');
+                    root.style.setProperty('--secondary-color', '#e57373');
+                    break;
+                case 'green':
+                    root.style.setProperty('--primary-color', '#5cb85c');
+                    root.style.setProperty('--secondary-color', '#81c784');
+                    break;
+                case 'orange':
+                    root.style.setProperty('--primary-color', '#f0ad4e');
+                    root.style.setProperty('--secondary-color', '#ffb74d');
+                    break;
+                case 'cyan':
+                    root.style.setProperty('--primary-color', '#5bc0de');
+                    root.style.setProperty('--secondary-color', '#4dd0e1');
+                    break;
+            }
+            
+            // 保存主题设置
+            localStorage.setItem('theme', color);
+        }
+
+        // 初始化主题
+        const savedTheme = localStorage.getItem('theme') || 'blue';
+        document.querySelector(`.theme-color[data-color="${savedTheme}"]`).classList.add('active');
+        changeTheme(savedTheme);
+
+        // 模拟文案生成
+        document.getElementById('generate-emotion').addEventListener('click', function() {
+            const emotions = {
+                '快乐': '今天阳光正好，微风不燥，心情像棉花糖一样柔软甜蜜。生活中的小确幸，总在不经意间温暖我们的心房。保持微笑，好运自然来！',
+                '兴奋': '心跳加速，热血沸腾！前方有无限可能等待探索，每一次尝试都是新的冒险。让我们一起追逐梦想，创造属于自己的精彩篇章！',
+                '平静': '静坐窗前，看云卷云舒。内心如湖水般平静，呼吸与自然同频。在这喧嚣世界中，找到属于自己的宁静角落，也是一种幸福。',
+                '忧郁': '雨滴敲打着窗棂，思绪如丝般缠绕。那些未说出口的话，藏在心底的遗憾，都化作此刻的淡淡忧伤。但请相信，明天太阳依旧会升起。',
+                '愤怒': '怒火在胸中燃烧，不公与委屈让人难以平静。但请记住，冷静思考比冲动行事更有力量。将愤怒转化为前进的动力，证明自己的价值！'
+            };
+            
+            const activeTag = document.querySelector('#emotion-card .tag.active');
+            const emotion = activeTag ? activeTag.textContent : '快乐';
+            document.getElementById('emotion-result').textContent = emotions[emotion] || emotions['快乐'];
+        });
+
+        document.getElementById('generate-life').addEventListener('click', function() {
+            const lifeScenes = {
+                '日常分享': '清晨的第一缕阳光透过窗帘，咖啡香气弥漫整个房间。平凡的日子里藏着不平凡的幸福，记录生活，就是记录美好。',
+                '旅行记录': '走过山川湖海，看过日出日落。每一次旅行都是与自己的对话，在陌生的地方发现久违的感动。世界那么大，值得去看看！',
+                '美食体验': '舌尖上的幸福，是最直接的快乐。从食材到成品，每一道美食都承载着厨师的心意。用心品尝，生活处处有惊喜。',
+                '工作感悟': '职场如战场，但也充满成长的机会。每一次挑战都是磨砺，每一次成功都是积累。保持学习的心态，未来可期。',
+                '家庭时光': '家的温暖，是世间最珍贵的礼物。与亲人共度的时光，无论长短，都是生命中最美的风景。珍惜当下，感恩拥有。'
+            };
+            
+            const activeTag = document.querySelector('#life-card .tag.active');
+            const scene = activeTag ? activeTag.textContent : '日常分享';
+            document.getElementById('life-result').textContent = lifeScenes[scene] || lifeScenes['日常分享'];
+        });
+
+        document.getElementById('polish-text').addEventListener('click', function() {
+            const originalText = document.querySelector('#polish-card textarea').value;
+            if (!originalText.trim()) {
+                document.getElementById('polish-result').textContent = '请输入需要润色的文案';
+                return;
+            }
+            
+            // 模拟润色过程
+            document.getElementById('polish-result').textContent = `润色后的文案：\n\n${originalText}\n\n✨ 文案已优化，语言更加流畅生动，表达更加精准有力！`;
+        });
+
+        document.getElementById('generate-news').addEventListener('click', function() {
+            const topic = document.querySelector('#news-card input').value || '科技创新';
+            
+            const newsTemplates = {
+                '时事新闻': `【${topic}】今日，相关部门负责人表示，将进一步加强管理，确保各项工作有序推进。`,
+                '财经新闻': `【财经快讯】${topic}领域近期表现亮眼，市场分析师认为这一趋势将持续。`,
+                '科技新闻': `【科技前沿】${topic}取得重大突破，专家表示这将为行业发展带来新机遇。`,
+                '娱乐新闻': `【娱乐资讯】${topic}引发热议，粉丝们纷纷表示期待后续发展。`,
+                '体育新闻': `【体育快报】${topic}比赛中，选手们展现出高超技艺，赢得观众阵阵掌声。`
+            };
+            
+            const newsType = document.querySelector('#news-card select').value;
+            document.getElementById('news-result').textContent = newsTemplates[newsType] || newsTemplates['科技新闻'];
+        });
+    </script>
+</body>
+</html>
